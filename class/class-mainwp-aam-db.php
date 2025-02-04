@@ -27,11 +27,6 @@ class MainWP_AAM_DB {
 	private $table;
 
 	/**
-	 * @var \wpdb $wpdb WordPress database object.
-	 */
-	private $wpdb;
-
-	/**
 	 * Get the singleton instance.
 	 *
 	 * @return self|null
@@ -52,7 +47,6 @@ class MainWP_AAM_DB {
 		global $wpdb;
 
 		$this->table = $wpdb->prefix . 'mainwp_wp_options';
-  		$this->wpdb = &$wpdb;
 	}
 
 	/**
@@ -74,16 +68,30 @@ class MainWP_AAM_DB {
 	 * @access public
 	 */
 	public function save_sync_data($data, $site_id) {
+		global $wpdb;
+
 		// Check if we are going to update or insert new value
 		$existing = $this->get_sync_data($site_id);
 
 		if (!empty($existing)) {
-			$query = $this->wpdb->prepare( "UPDATE `$this->table` SET `value` = %s WHERE `wpid` = %d AND `name` = %s", serialize($data), $site_id, 'aam_sync_data' );
+			$result = $wpdb->query( $wpdb->prepare(
+				'UPDATE %i SET `value` = %s WHERE `wpid` = %d AND `name` = %s',
+				$this->table,
+				serialize( $data ),
+				$site_id,
+				'aam_sync_data'
+			) );
 		} else {
-			$query = $this->wpdb->prepare( "INSERT INTO `$this->table` (`wpid`, `name`, `value`) VALUES (%d, %s, %s)", $site_id, 'aam_sync_data', serialize($data) );
+			$result = $wpdb->query( $wpdb->prepare(
+				'INSERT INTO %i (`wpid`, `name`, `value`) VALUES (%d, %s, %s)',
+				$this->table,
+				$site_id,
+				'aam_sync_data',
+				serialize( $data )
+			) );
 		}
 
-		return $this->wpdb->query( $query );
+		return $result;
 	}
 
 	/**
@@ -95,7 +103,26 @@ class MainWP_AAM_DB {
 	 * @access public
 	 */
 	public function get_sync_data($site_id) {
-		return maybe_unserialize( $this->wpdb->get_var( $this->wpdb->prepare( "SELECT `value` FROM $this->table WHERE `name` = %s AND `wpid` = %d LIMIT 1", 'aam_sync_data', $site_id ) ));
+		global $wpdb;
+
+		$query = $wpdb->prepare(
+			'SELECT `value` FROM %i WHERE `name` = %s AND `wpid` = %d LIMIT 1',
+			$this->table,
+			'aam_sync_data',
+			$site_id
+		);
+
+		$cache_key = md5( $query );
+		$result    = wp_cache_get( $cache_key, 'mainwp-aam' );
+
+
+		if ( empty( $result ) ) {
+			$result = $wpdb->get_var( $query );
+
+			wp_cache_set( $cache_key, $result, 'mainwp-aam' );
+		}
+
+		return maybe_unserialize( $result );
 	}
 
 }

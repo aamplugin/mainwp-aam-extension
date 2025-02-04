@@ -48,7 +48,7 @@ class MainWP_AAM_Widget {
 	 * Renders the individual site Overview page widget content.
 	 */
 	public static function render_site_overview_widget() {
-		$site_id = isset( $_GET['dashboard'] ) ? $_GET['dashboard'] : 0;
+		$site_id = isset( $_GET['dashboard'] ) ? intval( $_GET['dashboard'] ) : 0;
 
 		if ( empty( $site_id ) ) {
 			return;
@@ -60,8 +60,8 @@ class MainWP_AAM_Widget {
         <div class="ui grid">
             <div class="twelve wide column">
                 <h3 class="ui header handle-drag">
-					<?php echo __( 'AAM Security Score', 'mainwp-aam-extension' ); ?>
-                    <div class="sub header"><?php echo __( 'Your current website score', 'mainwp-aam-extension' ); ?></div>
+					<?php echo esc_js( __( 'AAM Security Score', 'mainwp-aam-extension' ) ); ?>
+                    <div class="sub header"><?php echo esc_js( __( 'Your current website score', 'mainwp-aam-extension' ) ); ?></div>
                 </h3>
             </div>
         </div>

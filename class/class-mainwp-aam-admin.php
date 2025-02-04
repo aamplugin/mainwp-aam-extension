@@ -54,7 +54,7 @@ class MainWP_AAM_Admin {
 	 */
 	public function manage_sites_column( $columns ) {
 		return array_merge($columns, [
-			'aam_summary' =>  __( 'AAM Issues', 'mainwp-lighthouse-extension' )
+			'aam_summary' =>  __( 'AAM Issues', 'mainwp-aam-extension' )
 		]);
 	}
 

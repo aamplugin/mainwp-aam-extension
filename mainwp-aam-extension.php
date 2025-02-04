@@ -7,6 +7,8 @@
   Author: Vasyltech LLC
   Author URI: https://vasyltech.com
   Documentation URI: https://aamportal.com/integrations/mainwp
+  License: GPLv3
+  License URI: http://www.gnu.org/licenses/gpl.html
  */
 
 
@@ -193,7 +195,7 @@ class MainWP_AAM_Extension_Activator {
 	 * @return mixed $inputs.
 	 */
 	public function hook_log_specific( $inputs ) {
-		$inputs[ MAINWP_AAM_LOG_PRIORITY ] = __( 'AAM logs', 'mainwp-pro-reports-extension' );
+		$inputs[ MAINWP_AAM_LOG_PRIORITY ] = __( 'AAM logs', 'mainwp-aam-extension' );
 		return $inputs;
 	}
 	public function get_child_key() {
@@ -212,7 +214,7 @@ class MainWP_AAM_Extension_Activator {
 	public function admin_notices() {
 		global $current_screen;
 		if ( $current_screen->parent_base == 'plugins' && $this->mainwpMainActivated == false ) {
-			echo '<div class="error"><p>' . sprintf( esc_html__( 'MainWP AAM Extension requires %1$sMainWP Dashboard Plugin%2$s to be activated in order to work. Please install and activate %3$sMainWP Dashboard Plugin%4$s first.' ), '<a href="http://mainwp.com/" target="_blank">', '</a>', '<a href="http://mainwp.com/" target="_blank">', '</a>' ) . '</p></div>';
+			echo '<div class="error"><p>' . sprintf( esc_html__( 'MainWP AAM Extension requires %1$sMainWP Dashboard Plugin%2$s to be activated in order to work. Please install and activate %3$sMainWP Dashboard Plugin%4$s first.', 'mainwp-aam-extension' ), '<a href="http://mainwp.com/" target="_blank">', '</a>', '<a href="http://mainwp.com/" target="_blank">', '</a>' ) . '</p></div>';
 		}
 	}
 
@@ -253,10 +255,10 @@ class MainWP_AAM_Extension_Activator {
 			$metaboxes = array();
 		}
 
-		if (isset($_GET['dashboard'])) {
-			$data = MainWP_AAM_DB::get_instance()->get_sync_data($_GET['dashboard']);
+		if ( isset( $_GET['dashboard'] ) ) {
+			$data = MainWP_AAM_DB::get_instance()->get_sync_data( intval( $_GET['dashboard'] ) );
 
-			if (!empty($data['security_score']))
+			if ( ! empty( $data['security_score'] ) )
 			$metaboxes[] = array(
 				'id'            => 'aam-widget',
 				'plugin'        => $this->childFile,
