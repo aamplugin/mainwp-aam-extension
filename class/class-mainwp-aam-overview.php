@@ -53,7 +53,7 @@ class MainWP_AAM_Overview {
 		?>
 
 		<div class="ui labeled icon inverted menu mainwp-sub-submenu" id="mainwp-pro-aam-menu">
-			<a href="admin.php?page=Extensions-Mainwp-Aam-Extension&tab=settings" class="item <?php echo ( $current_tab == 'settings' || $current_tab == '' ) ? 'active' : ''; ?>"><i class="file alternate outline icon"></i> <?php esc_html_e( 'Settings', 'mainwp-aam-extension' ); ?></a>
+			<a href="admin.php?page=Extensions-Mainwp-Aam-Extension&tab=settings" class="item <?php echo ( $current_tab == 'settings' || $current_tab == '' ) ? 'active' : ''; ?>"><i class="file alternate outline icon"></i> <?php esc_html_e( 'Settings', 'aam-extension-mainwp' ); ?></a>
 		</div>
         <div>
 			<div class="sub header" style="padding: 3rem;">AAM extension currently does not have any settings</div>

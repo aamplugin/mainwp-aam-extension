@@ -1,6 +1,6 @@
 <?php
 /*
-  Plugin Name: MainWP AAM Extension
+  Plugin Name: AAM Extension for MainWP
   Plugin URI: https://aamportal.com
   Description: AAM extension to connect all sites to MainWP Dashboard
   Version: 1.0.0
@@ -32,14 +32,18 @@ if ( ! defined( 'MAINWP_AAM_LOG_PRIORITY' ) ) {
 	define( 'MAINWP_AAM_LOG_PRIORITY', 2024011 );
 }
 
+if ( ! defined( 'MAINWP_AAM_EXTENSION_VERSION' ) ) {
+	define( 'MAINWP_AAM_EXTENSION_VERSION', '1.0.0' );
+}
+
 class MainWP_AAM_Extension_Activator {
 
 	protected $mainwpMainActivated = false;
 	protected $childEnabled        = false;
 	protected $childKey            = false;
 	protected $childFile;
-	protected $plugin_handle    = 'mainwp-aam-extension';
-	protected $product_id       = 'MainWP AAM Extension';
+	protected $plugin_handle    = 'aam-extension-aam';
+	protected $product_id       = 'AAM Extension for MainWP';
 	protected $software_version = '1.0';
 
 	public function __construct() {
@@ -75,6 +79,7 @@ class MainWP_AAM_Extension_Activator {
 		}
 
 		add_action( 'admin_notices', array( &$this, 'admin_notices' ) );
+		add_action( 'admin_init', array( &$this, 'admin_init' ) );
 	}
 
 	/**
@@ -103,7 +108,7 @@ class MainWP_AAM_Extension_Activator {
 			return;
 		}
 		$class_name = str_replace( '_', '-', strtolower( $class_name ) );
-		$class_file = WP_PLUGIN_DIR . DIRECTORY_SEPARATOR . str_replace( basename( __FILE__ ), '', plugin_basename( __FILE__ ) ) . 'class' . DIRECTORY_SEPARATOR . 'class-' . $class_name . '.php';
+		$class_file = implode( DIRECTORY_SEPARATOR, array( MAINWP_AAM_PLUGIN_DIR, 'class' , 'class-' . $class_name . '.php' ) );
 		if ( file_exists( $class_file ) ) {
 			require_once $class_file;
 		}
@@ -195,7 +200,7 @@ class MainWP_AAM_Extension_Activator {
 	 * @return mixed $inputs.
 	 */
 	public function hook_log_specific( $inputs ) {
-		$inputs[ MAINWP_AAM_LOG_PRIORITY ] = __( 'AAM logs', 'mainwp-aam-extension' );
+		$inputs[ MAINWP_AAM_LOG_PRIORITY ] = __( 'AAM logs', 'aam-extension-mainwp' );
 		return $inputs;
 	}
 	public function get_child_key() {
@@ -214,9 +219,31 @@ class MainWP_AAM_Extension_Activator {
 	public function admin_notices() {
 		global $current_screen;
 		if ( $current_screen->parent_base == 'plugins' && $this->mainwpMainActivated == false ) {
-			echo '<div class="error"><p>' . sprintf( esc_html__( 'MainWP AAM Extension requires %1$sMainWP Dashboard Plugin%2$s to be activated in order to work. Please install and activate %3$sMainWP Dashboard Plugin%4$s first.', 'mainwp-aam-extension' ), '<a href="http://mainwp.com/" target="_blank">', '</a>', '<a href="http://mainwp.com/" target="_blank">', '</a>' ) . '</p></div>';
+			echo '<div class="error"><p>' . sprintf(
+				/* translators: 1: A-tag to MainWP, 2: A-tag to MainWP, 3: A-tag to MainWP, 4: A-tag to MainWP */
+				esc_html__(
+					'MainWP AAM Extension requires %1$sMainWP Dashboard Plugin%2$s to be activated in order to work. Please install and activate %3$sMainWP Dashboard Plugin%4$s first.',
+					'aam-extension-mainwp'
+				),
+				'<a href="http://mainwp.com/" target="_blank">',
+				'</a>',
+				'<a href="http://mainwp.com/" target="_blank">',
+				'</a>'
+			) . '</p></div>';
 		}
 	}
+
+	/**
+	 * Admin init hook
+	 *
+	 * @return void
+	 */
+	public function admin_init() {
+        if ( ! isset( $_GET['page'] ) || 'managesites' == $_GET['page'] ) {
+            wp_enqueue_style( 'aam-extension-mainwp', MAINWP_AAM_PLUGIN_URL . 'media/style.css', array(), MAINWP_AAM_EXTENSION_VERSION );
+            wp_enqueue_script( 'aam-extension-mainwp', MAINWP_AAM_PLUGIN_URL . 'media/javascript.js', array( 'jquery' ), MAINWP_AAM_EXTENSION_VERSION, array( 'in_footer' => true ) );
+        }
+    }
 
 	/**
 	 * Activates the extension in WordPress.
@@ -258,14 +285,15 @@ class MainWP_AAM_Extension_Activator {
 		if ( isset( $_GET['dashboard'] ) ) {
 			$data = MainWP_AAM_DB::get_instance()->get_sync_data( intval( $_GET['dashboard'] ) );
 
-			if ( ! empty( $data['security_score'] ) )
-			$metaboxes[] = array(
-				'id'            => 'aam-widget',
-				'plugin'        => $this->childFile,
-				'key'           => $this->childKey,
-				'metabox_title' => __( 'Advanced Access Manager', 'mainwp-aam-extension' ),
-				'callback'      => array( MainWP_AAM_Widget::get_instance(), 'render_metabox' ),
-			);
+			if ( ! empty( $data['security_score'] ) ) {
+				$metaboxes[] = array(
+					'id'            => 'aam-widget',
+					'plugin'        => $this->childFile,
+					'key'           => $this->childKey,
+					'metabox_title' => __( 'Advanced Access Manager', 'aam-extension-mainwp' ),
+					'callback'      => array( MainWP_AAM_Widget::get_instance(), 'render_metabox' ),
+				);
+			}
 		}
 
 

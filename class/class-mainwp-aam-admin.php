@@ -54,7 +54,7 @@ class MainWP_AAM_Admin {
 	 */
 	public function manage_sites_column( $columns ) {
 		return array_merge($columns, [
-			'aam_summary' =>  __( 'AAM Issues', 'mainwp-aam-extension' )
+			'aam_summary' =>  __( 'AAM Issues', 'aam-extension-mainwp' )
 		]);
 	}
 
@@ -107,7 +107,7 @@ class MainWP_AAM_Admin {
 	 * @return void
 	 */
 	public function localization() {
-		load_plugin_textdomain( 'mainwp-aam-extension', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+		load_plugin_textdomain( 'aam-extension-mainwp', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 	}
 
 	/**
@@ -119,7 +119,7 @@ class MainWP_AAM_Admin {
 	 * @return mixed Array of plugin meta data.
 	 */
 	public function plugin_row_meta( $plugin_meta, $plugin_file ) {
-		if ( 'mainwp-aam-extension/mainwp-aam-extension.php' != $plugin_file ) {
+		if ( 'aam-extension-mainwp/aam-extension-mainwp.php' != $plugin_file ) {
 			return $plugin_meta;
 		}
 		$slug     = basename( $plugin_file, '.php' );
@@ -139,7 +139,7 @@ class MainWP_AAM_Admin {
 	 * @return array $input Input.
 	 */
 	public function widgets_screen_options( $input ) {
-		$input['advanced-aam-widget'] = __( 'AAM Widget', 'mainwp-aam-extension' );
+		$input['advanced-aam-widget'] = __( 'AAM Widget', 'aam-extension-mainwp' );
 		return $input;
 	}
 }
